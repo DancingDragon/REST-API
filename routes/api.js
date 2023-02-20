@@ -69,7 +69,7 @@ router.post('/users', asyncHandler(async (req, res) => {
 	try {
 		//Create a new user. Password is hashed in the User password setter.
 		const user = await User.create(req.body);
-		res.location('/').status(201).json({"message": "User successfully created."});
+		res.location('/').status(201).json();
 	} catch (error) {
 		console.log(error);
 		//Check for validation errors or constraint error
@@ -89,6 +89,7 @@ router.get('/courses', asyncHandler(async (req, res) => {
 	const courses = await Course.findAll({
 		include: [{
 			model: User,
+			attributes: ["id", "firstName", "lastName", "emailAddress"]
 		}],
 		attributes: {  
 			exclude: ["createdAt", "updatedAt"]	
@@ -138,6 +139,7 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
 	const course = await Course.findByPk(req.params.id, {
 		include: [{
 			model: User,
+			attributes: ["id", "firstName", "lastName", "emailAddress"]
 		}],
 		attributes: {  
 			exclude: ["createdAt", "updatedAt"]	
@@ -167,7 +169,7 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
 	
 	//authenticate user
 	if (req.currentUser.id !== course.userId) {
-		res.status(401).json("Access denied.");
+		res.status(403).json("Access denied.");
 		return;
 	}
 	
@@ -184,7 +186,7 @@ router.delete('/courses/:id', authenticateUser, asyncHandler(async (req, res) =>
 	const course = await Course.findByPk(req.params.id);
 	//authenticate user
 	if (req.currentUser.id !== course.userId) {
-		res.status(401).json("Access denied.");
+		res.status(403).json("Access denied.");
 		return;
 	}
 	
